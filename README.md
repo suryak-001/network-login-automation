@@ -27,4 +27,6 @@ This Python script automates the login process to a corporate network portal (su
 Install dependencies:
 
 ```bash
-pip install selenium requests
+sudo apt install python3 python3-pip -y
+pip3 install selenium
+sudo apt install chromium-chromedriver
