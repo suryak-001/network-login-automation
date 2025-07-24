@@ -112,6 +112,25 @@ def is_office_network_available(ssid="sample ssid"):
         logger.error(f"✗ Failed to scan Wi-Fi networks: {e}")
         return False
 
+
+def send_notification(title, message, urgency="normal", timeout=10000):
+    """Send a desktop notification using notify-send."""
+    try:
+        subprocess.run([
+            "notify-send",
+            title,
+            message,
+            f"--urgency={urgency}",  # low, normal, critical
+            f"--expire-time={timeout}",  # milliseconds
+            "--icon=network-wired"  # icon
+        ], check=True)
+        logger.info(f"Notification sent: {title} - {message}")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to send notification: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error sending notification: {e}")
+        
+
 def main():
     logger.info("="*60)
     logger.info("OFFICE NETWORK LOGIN AUTOMATION")
@@ -211,9 +230,19 @@ def main():
     # Post-login verification
     if login_successful:
         logger.info("\n🔍 Login appeared successful, checking internet connectivity...")
+        send_notification(
+            "Network Login Successful", 
+            "✅ You are now connected to the office network!",
+            urgency="normal"
+        )
         check_internet_connection()
     else:
         logger.warning("\n⚠️ Login status unclear, but checking internet connectivity anyway...")
+        send_notification(
+            "Network Login Failed", 
+            "❌ Could not log in automatically. Please check credentials.",
+            urgency="critical"
+        )
         check_internet_connection()
 
     logger.info("\n" + "="*60)
